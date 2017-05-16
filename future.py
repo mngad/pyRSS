@@ -1,3 +1,4 @@
+# source of this: http://code.activestate.com/recipes/84317/
 from threading import *
 import copy
 
