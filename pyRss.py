@@ -15,9 +15,7 @@ template = """<!DOCTYPE html>
 <body>
     <div id="content">
 
-        <ul id="index">
-            {links}
-        </ul>
+        {links}
 
     </div>
 </body>
