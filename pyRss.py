@@ -4,6 +4,7 @@ from future import Future
 rssURL = 'http://fraun.space/rss'
 directory = '/home/fraun/start/rss'  # directory where the index file will be
 # created and where the urlList and css files are found.
+
 template = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,18 +23,22 @@ template = """<!DOCTYPE html>
 </body>
 </html>
 """
+
+
 def remBadChar(string):
-    string= ''.join(c for c in string if c not in ' /\\(){}<>\'!')
+    string = ''.join(c for c in string if c not in ' /\\(){}<>\'!')
     return string
+
 
 def makePage(pageTitle, linkFormatted):
 
     context = {  # context for the tmplate - bits to change - filname etc.
         "links": linkFormatted
     }
-    indexFile = open(directory + '/'+pageTitle, 'w')
+    indexFile = open(directory + '/' + pageTitle, 'w')
     indexFile.write(template.format(**context))
     indexFile.close()
+
 
 def makeIndiePages(feed):
     linkFormatted = ''
@@ -53,8 +58,9 @@ def makeIndiePages(feed):
                 link + '">' + ' - ' + title + '</a><br>' + '\n'
 
     linkFormatted = linkFormatted + '<p> <a href="' + \
-            rssURL + '">' + '<<< BACK' + '</a> </p>' + '\n'
-    makePage(remBadChar(feed['channel']['title'])+'.html', linkFormatted)
+        rssURL + '">' + '<<< BACK' + '</a> </p>' + '\n'
+    makePage(remBadChar(feed['channel']['title']) + '.html', linkFormatted)
+
 
 def getLinks():  # get the urls, feeds, links and link titles
 
@@ -71,7 +77,9 @@ def getLinks():  # get the urls, feeds, links and link titles
         print(feed["channel"]["title"])
         # create title for each feed
         makeIndiePages(feed)
-        linkFormatted = linkFormatted + '<p> <a href="' + rssURL + '/' + remBadChar(feed['channel']['title'])+'.html' + '">' + feed['channel']['title'] + '</a> </p>' + '\n'
+        linkFormatted = linkFormatted + '<p> <a href="' + rssURL + '/' + \
+            remBadChar(feed['channel']['title']) + '.html' + '">' + \
+            feed['channel']['title'] + '</a> </p>' + '\n'
         count = 0
         for entry in feed['items']:
             if count == 5:
@@ -90,4 +98,4 @@ def getLinks():  # get the urls, feeds, links and link titles
 if __name__ == '__main__':
 
     linkFormatted = getLinks()
-    makePage('index.html',linkFormatted)
+    makePage('index.html', linkFormatted)
