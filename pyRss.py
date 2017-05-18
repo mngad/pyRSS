@@ -1,6 +1,10 @@
 import feedparser
 from future import Future
+import os
+from shutil import copyfile
 
+
+cwd = os.getcwd()
 rssURL = 'http://fraun.space/rss'
 directory = '/home/fraun/start/rss'  # directory where the index file will be
 # created and where the urlList and css files are found.
@@ -99,3 +103,7 @@ if __name__ == '__main__':
 
     linkFormatted = getLinks()
     makePage('index.html', linkFormatted)
+    if os.path.isfile(directory + '/minimal.css'):
+        continue
+    else:
+        copyfile(cwd + '/minimal.css', direc + '/minimal.css')
