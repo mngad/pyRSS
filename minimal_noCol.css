@@ -1,0 +1,30 @@
+html {
+	background-color:#222222;
+}
+body {
+	font-family: 'Share Tech Mono', Monospace, Courier;
+	/*font-family:sans-serif;*/
+	font-size:14px;
+	padding: 30px 30px 30px 30px;
+}
+/* ---------------------------------- */
+a {
+	color:#BABABA;
+	text-decoration: none;
+}
+a:visited {
+	color:#7A7A7A;
+	text-decoration: underline;
+}
+a:hover {
+	color:#BABABA;
+	text-decoration: underline;
+}
+p {
+	color:#BABABA;
+	text-decoration:none;
+	outline:none;
+	font-weight: bold;
+	font-size:18px;
+}
+

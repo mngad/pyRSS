@@ -15,8 +15,8 @@ template = """<!DOCTYPE html>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="stylesheet" type="text/css" href="minimal.css" />
-    <title>RSS</title>
+    <link rel="stylesheet" type="text/css" href="minimal_{}.css" />
+    <title>{}</title>
 </head>
 <body>
     <div id="content">
@@ -34,13 +34,13 @@ def remBadChar(string):
     return string
 
 
-def makePage(pageTitle, linkFormatted):
+def makePage(pageTitle, linkFormatted, htmlTitle, cssType):
 
     context = {  # context for the tmplate - bits to change - filname etc.
         "links": linkFormatted
     }
     indexFile = open(directory + '/' + pageTitle, 'w')
-    indexFile.write(template.format(**context))
+    indexFile.write(template.format(cssType, htmlTitle, **context))
     indexFile.close()
 
 
@@ -63,7 +63,8 @@ def makeIndiePages(feed):
 
     linkFormatted = linkFormatted + '<p> <a href="' + \
         rssURL + '">' + '<<< BACK' + '</a> </p>' + '\n'
-    makePage(remBadChar(feed['channel']['title']) + '.html', linkFormatted)
+    makePage(remBadChar(feed['channel']['title']) + '.html', linkFormatted,
+            feed['channel']['title'], 'noCol')
 
 
 def getLinks():  # get the urls, feeds, links and link titles
@@ -102,6 +103,8 @@ def getLinks():  # get the urls, feeds, links and link titles
 if __name__ == '__main__':
 
     linkFormatted = getLinks()
-    makePage('index.html', linkFormatted)
-    if not os.path.isfile(directory + '/minimal.css'):
-        copyfile(cwd + '/minimal.css', direc + '/minimal.css')
+    makePage('index.html', linkFormatted, 'RSS', 'Col')
+    if not os.path.isfile(directory + '/minimal_Col.css'):
+        copyfile(cwd + '/minimal_Col.css', directory + '/minimal_Col.css')
+    if not os.path.isfile(directory + '/minimal_noCol.css'):
+        copyfile(cwd + '/minimal_noCol.css', directory + '/minimal_noCol.css')
