@@ -6,7 +6,7 @@ from shutil import copyfile
 
 cwd = os.getcwd()
 rssURL = 'http://fraun.space/rss'
-directory = '/home/fraun/start/rss'  # directory where the index file will be
+directory = '/srv/http/rss'  # directory where the index file will be
 # created and where the urlList and css files are found.
 
 template = """<!DOCTYPE html>
@@ -103,7 +103,5 @@ if __name__ == '__main__':
 
     linkFormatted = getLinks()
     makePage('index.html', linkFormatted)
-    if os.path.isfile(directory + '/minimal.css'):
-        continue
-    else:
+    if not os.path.isfile(directory + '/minimal.css'):
         copyfile(cwd + '/minimal.css', direc + '/minimal.css')
