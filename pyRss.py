@@ -4,7 +4,6 @@ from shutil import copyfile
 
 import feedparser
 
-
 from future import Future
 
 
@@ -48,11 +47,21 @@ def make_page(page_title, link_formatted, html_title, css_type):
     index_file.close()
 
 
+def make_link_list(page_title, links):
+    link_file = open(directory + '/' + page_title + '.txt', 'a')
+    for link in links:
+        if link['link'] not in link_file:
+            link_file.write(link['link'] + '\n')
+    
+    link_file.close()
+
+
 def make_indie_pages(feed):
     link_formatted = ''
     link_formatted = link_formatted + '<p> <a href="' + \
         feed['url'] + '">' + feed['channel']['title'] + '</a> </p>' + '\n'
     count = 0
+    make_link_list(rem_bad_char(feed['channel']['title']), feed['items'])
     for entry in feed['items']:
         if count == 100:
             #  print('\n')
