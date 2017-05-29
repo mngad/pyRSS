@@ -1,15 +1,15 @@
+import configparser
+
 import os
+
+import sys
 
 from shutil import copyfile
 
 import feedparser
 
-import configparser
-
-import sys
 
 from future import Future
-
 
 
 def rem_bad_char(string):
@@ -56,26 +56,28 @@ def make_link_list(page_title, links):
 
     link_file.close()
 
+
 def get_link_list(page_title):
 
     link_file_name = directory + '/' + page_title + '.txt'
-    print(link_file_name)
     contents = ''
     try:
         with open(link_file_name, 'r') as file:
             for line in reversed(file.read().splitlines()):
                 contents += line
     except OSError:
-        print('ERROROROROR')
+        print("No file exists for rss backup - is this a new url?")
 
     return contents
+
 
 def make_indie_pages(feed):
 
     contents = get_link_list(rem_bad_char(feed['channel']['title']))
     link_formatted = ''
     link_formatted = link_formatted + '<p> <a href="' + \
-            'http://' + split_url(feed['url'])[2] + '">' + feed['channel']['title'] + '</a> </p>' + '\n'
+        'http://' + split_url(feed['url'])[2] + '">' + \
+        feed['channel']['title'] + '</a> </p>' + '\n'
     for entry in feed['items']:
         if entry['link'] not in contents:
             title = entry['title']
@@ -86,7 +88,7 @@ def make_indie_pages(feed):
 
     link_formatted = link_formatted + contents
     link_formatted = link_formatted + '<p> <a href="' + \
-        rssURL + '">' + '<<< BACK' + '</a> </p>' + '\n'
+        rssurl + '">' + '<<< BACK' + '</a> </p>' + '\n'
     make_page(rem_bad_char(feed['channel']['title']) + '.html', link_formatted,
               feed['channel']['title'], 'noCol')
     make_link_list(rem_bad_char(feed['channel']['title']), link_formatted)
@@ -107,13 +109,12 @@ def get_links():  # get the urls, feeds, links and link titles
         print(feed["channel"]["title"])
         # create title for each feed
         make_indie_pages(feed)
-        link_formatted = link_formatted + '<p> <a href="' + rssURL + '/' + \
+        link_formatted = link_formatted + '<p> <a href="' + rssurl + '/' + \
             rem_bad_char(feed['channel']['title']) + '.html' + '">' + \
             feed['channel']['title'] + '</a> </p>' + '\n'
         count = 0
         for entry in feed['items']:
             if count == 5:
-                print('\n')
                 break
             else:  # create links for top five from each feed
                 count = count + 1
@@ -127,24 +128,25 @@ def get_links():  # get the urls, feeds, links and link titles
 
 def get_settings():
 
-    conf_dir = os.path.expanduser("~") + '/.config/.rss_conf.ini'
     try:
         settings = configparser.ConfigParser()
         settings._interpolation = configparser.ExtendedInterpolation()
         settings.read(os.path.expanduser("~") + '/.config/.rss_conf.ini')
-        print('Reading settings from: ' +  os.path.expanduser("~") + '/.config/.rss_conf.ini')
-        rssURL = settings.get('Dir', 'rssURL')
+        print('Reading settings from: ' +
+              os.path.expanduser("~") + '/.config/.rss_conf.ini')
+        rssurl = settings.get('Dir', 'rssurl')
         directory = settings.get('Dir', 'directory')
         template = settings.get('Template', 'template')
-        return rssURL, directory, template
+        return rssurl, directory, template
     except Exception:
-        print('Must copy rss_conf.ini to the ~/.config/ and add the directory and url for the rss pages first')
+        print('Must copy rss_conf.ini to the ~/.config/ and add the directory \
+            and url for the rss pages first')
         sys.exit(0)
 
 if __name__ == '__main__':
 
     cwd = os.getcwd()
-    rssURL, directory, template = get_settings()
+    rssurl, directory, template = get_settings()
 
     link_formatted = get_links()
     make_page('index.html', link_formatted, 'RSS', 'Col')
