@@ -8,7 +8,6 @@ from shutil import copyfile
 
 import feedparser
 
-
 from future import Future
 
 
