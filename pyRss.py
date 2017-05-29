@@ -33,6 +33,7 @@ template = """<!DOCTYPE html>
 
 
 def rem_bad_char(string):
+
     string = ''.join(c for c in string if c not in ' /\\(){}<>\'!')
     return string
 
@@ -48,43 +49,61 @@ def make_page(page_title, link_formatted, html_title, css_type):
 
 
 def make_link_list(page_title, links):
-    link_file = open(directory + '/' + page_title + '.txt', 'r')
-    file_exists = os.path.isfile(directory + '/' + page_title + '.txt')
-    link_file.close()
+
+    link_file_name = directory + '/' + page_title + '.txt'
+    try:
+        with open(link_file_name, 'r') as file:
+            contents = file.read()
+            file_exists = True
+    except OSError:
+        contents = ''
+        file_exists = False
     link_file = open(directory + '/' + page_title + '.txt', 'a')
     if file_exists:
-        for link in reversed(links):
-            if link['link'] not in link_file:
-                link_file.write(link['link'] + '\n')
+        for link in reversed(links.splitlines()):
+            if link not in contents and '<p>' not in link:
+                link_file.write(link + '\n')
     else:
-        for link in reversed(links):
-            link_file.write(link['link'] + '\n')
-    
+        for link in reversed(links.splitlines()):
+            if '<p>' not in link:
+                link_file.write(link + '\n')
+
     link_file.close()
 
+def get_link_list(page_title):
+
+    link_file_name = directory + '/' + page_title + '.txt'
+    print(link_file_name)
+    contents = ''
+    try:
+        with open(link_file_name, 'r') as file:
+            for line in reversed(file.read().splitlines()):
+                contents += line
+    except OSError:
+        print('ERROROROROR')
+
+    return contents
 
 def make_indie_pages(feed):
+
+    contents = get_link_list(rem_bad_char(feed['channel']['title']))
     link_formatted = ''
     link_formatted = link_formatted + '<p> <a href="' + \
         feed['url'] + '">' + feed['channel']['title'] + '</a> </p>' + '\n'
-    count = 0
-    make_link_list(rem_bad_char(feed['channel']['title']), feed['items'])
     for entry in feed['items']:
-        if count == 100:
-            #  print('\n')
-            break
-        else:  # create links for top five from each feed
-            count = count + 1
+        if entry['link'] not in contents:
             title = entry['title']
             link = entry['link']
             # print('{}, [{}]'.format(entry["title"], entry['link']))
             link_formatted = link_formatted + '<a href="' + \
                 link + '">' + ' - ' + title + '</a><br>' + '\n'
 
+    link_formatted = link_formatted + contents
     link_formatted = link_formatted + '<p> <a href="' + \
         rssURL + '">' + '<<< BACK' + '</a> </p>' + '\n'
     make_page(rem_bad_char(feed['channel']['title']) + '.html', link_formatted,
               feed['channel']['title'], 'noCol')
+    make_link_list(rem_bad_char(feed['channel']['title']), link_formatted)
 
 
 def get_links():  # get the urls, feeds, links and link titles
