@@ -4,38 +4,24 @@ from shutil import copyfile
 
 import feedparser
 
+import configparser
+
+import sys
+
 from future import Future
 
-
-cwd = os.getcwd()
-rssURL = 'http://fraun.space/rss'
-directory = '/srv/http/rss'  # directory where the index file will be
-# created and where the urlList and css files are found.
-
-template = """<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="stylesheet" type="text/css" href="minimal_{}.css" />
-    <title>{}</title>
-</head>
-<body>
-    <div id="content">
-
-        {links}
-
-    </div>
-</body>
-</html>
-"""
 
 
 def rem_bad_char(string):
 
     string = ''.join(c for c in string if c not in ' /\\(){}<>\'!')
     return string
+
+
+def split_url(string):
+
+    newstr = string.split('/')
+    return newstr
 
 
 def make_page(page_title, link_formatted, html_title, css_type):
@@ -89,7 +75,7 @@ def make_indie_pages(feed):
     contents = get_link_list(rem_bad_char(feed['channel']['title']))
     link_formatted = ''
     link_formatted = link_formatted + '<p> <a href="' + \
-        feed['url'] + '">' + feed['channel']['title'] + '</a> </p>' + '\n'
+            'http://' + split_url(feed['url'])[2] + '">' + feed['channel']['title'] + '</a> </p>' + '\n'
     for entry in feed['items']:
         if entry['link'] not in contents:
             title = entry['title']
@@ -139,7 +125,26 @@ def get_links():  # get the urls, feeds, links and link titles
     return link_formatted
 
 
+def get_settings():
+
+    conf_dir = os.path.expanduser("~") + '/.config/.rss_conf.ini'
+    try:
+        settings = configparser.ConfigParser()
+        settings._interpolation = configparser.ExtendedInterpolation()
+        settings.read(os.path.expanduser("~") + '/.config/.rss_conf.ini')
+        print('Reading settings from: ' +  os.path.expanduser("~") + '/.config/.rss_conf.ini')
+        rssURL = settings.get('Dir', 'rssURL')
+        directory = settings.get('Dir', 'directory')
+        template = settings.get('Template', 'template')
+        return rssURL, directory, template
+    except Exception:
+        print('Must copy rss_conf.ini to the ~/.config/ and add the directory and url for the rss pages first')
+        sys.exit(0)
+
 if __name__ == '__main__':
+
+    cwd = os.getcwd()
+    rssURL, directory, template = get_settings()
 
     link_formatted = get_links()
     make_page('index.html', link_formatted, 'RSS', 'Col')
