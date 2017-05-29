@@ -49,7 +49,7 @@ def make_page(page_title, link_formatted, html_title, css_type):
 
 def make_link_list(page_title, links):
     link_file = open(directory + '/' + page_title + '.txt', 'a')
-    if link_file.isfile():
+    if os.path.isfile(directory + '/' + page_title + '.txt'):
         for link in links:
             if link['link'] not in link_file:
                 link_file.write(link['link'] + '\n')
