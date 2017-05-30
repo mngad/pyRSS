@@ -6,7 +6,7 @@ A RSS reader that generates web pages with links to the articles from the select
 Setup
 -----
 
-.rss_conf.ini needs to be setup and copied to ~/.config/ in the users home directory:
+.rss_conf.ini needs to be setup and copied to `~/.config` in the users home directory:
 
 ```
 [Dir]
@@ -34,6 +34,11 @@ template: """<!DOCTYPE html>
 ```
 
 This contains the template for the webpages and more importantly the `rssurl` which points to the webpage where the pages will be displayed and `directory` which should be set to the directory on the server where the pages will be kept - ideally in a `RSS` or similar folder.
+
+urlFile.txt
+----
+
+This file should also be in the `~/.config` directory and should contain the rss links on separate lines.
 
 css files
 -------
