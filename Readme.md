@@ -10,7 +10,7 @@ Setup
 
 ```
 [Dir]
-rssurl: 
+rss_server_url: 
 directory: 
 
 [Template]

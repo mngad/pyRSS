@@ -87,18 +87,14 @@ def make_indie_pages(feed):
 
     link_formatted = link_formatted + contents
     link_formatted = link_formatted + '<p> <a href="' + \
-        rssurl + '">' + '<<< BACK' + '</a> </p>' + '\n'
+        rss_server_url + '">' + '<<< BACK' + '</a> </p>' + '\n'
     make_page(rem_bad_char(feed['channel']['title']) + '.html', link_formatted,
               feed['channel']['title'], 'noCol')
     make_link_list(rem_bad_char(feed['channel']['title']), link_formatted)
 
 
-def get_links():  # get the urls, feeds, links and link titles
+def get_links(urllist):  # get the urls, feeds, links and link titles
 
-    urllist = []
-    url_file = open(directory + '/urlFile.txt', 'r')
-    for line in url_file:
-        urllist.append(line)
     future_calls = [Future(feedparser.parse, rss_url) for rss_url in urllist]
     # multithread the download of the urls
     feeds = [future_obj() for future_obj in future_calls]
@@ -108,8 +104,8 @@ def get_links():  # get the urls, feeds, links and link titles
         print(feed["channel"]["title"])
         # create title for each feed
         make_indie_pages(feed)
-        link_formatted = link_formatted + '<p> <a href="' + rssurl + '/' + \
-            rem_bad_char(feed['channel']['title']) + '.html' + '">' + \
+        link_formatted = link_formatted + '<p> <a href="' + rss_server_url + \
+            '/' + rem_bad_char(feed['channel']['title']) + '.html' + '">' + \
             feed['channel']['title'] + '</a> </p>' + '\n'
         count = 0
         for entry in feed['items']:
@@ -125,6 +121,16 @@ def get_links():  # get the urls, feeds, links and link titles
     return link_formatted
 
 
+def get_url_file_list():
+
+    urllist = []
+    url_file = open(os.path.expanduser("~") + '/.config/urlFile.txt', 'r')
+    for line in url_file:
+        urllist.append(line)
+
+    return urllist
+
+
 def get_settings():
 
     try:
@@ -133,10 +139,10 @@ def get_settings():
         settings.read(os.path.expanduser("~") + '/.config/.rss_conf.ini')
         print('Reading settings from: ' +
               os.path.expanduser("~") + '/.config/.rss_conf.ini')
-        rssurl = settings.get('Dir', 'rssurl')
+        rss_server_url = settings.get('Dir', 'rss_server_url')
         directory = settings.get('Dir', 'directory')
         template = settings.get('Template', 'template')
-        return rssurl, directory, template
+        return rss_server_url, directory, template
     except Exception:
         print('Must copy rss_conf.ini to the ~/.config/ and add the directory \
             and url for the rss pages first')
@@ -145,9 +151,8 @@ def get_settings():
 if __name__ == '__main__':
 
     cwd = os.getcwd()
-    rssurl, directory, template = get_settings()
-
-    link_formatted = get_links()
+    rss_server_url, directory, template = get_settings()
+    link_formatted = get_links(get_url_file_list())
     make_page('index.html', link_formatted, 'RSS', 'Col')
     if not os.path.isfile(directory + '/minimal_Col.css'):
         copyfile(cwd + '/minimal_Col.css', directory + '/minimal_Col.css')
